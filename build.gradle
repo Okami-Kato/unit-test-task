@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.20'
+}
+
+group 'pl.allegro.tech.recruit'
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+project.ext.versions = [
+        spock : '2.1-groovy-3.0',
+        junit : '5.5.2'
+]
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation group: 'org.spockframework', name: 'spock-core', version: versions.spock
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.13.2'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.0.1'
+
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+    testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: versions.junit
+
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat = 'full'
+    }
+}
