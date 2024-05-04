@@ -7,23 +7,30 @@ import java.util.Optional;
 
 public class DeveloperReputationCalculator {
 
-    private static final int FOLLOWERS_MULTIPLIER = 2;
-    private static final int HACKTOBER_BONUS = 10;
+    private final int followersMultiplier;
+    private final int hacktoberBonus;
+
+    private final TimeService timeService;
+
+    public DeveloperReputationCalculator(int followersMultiplier, int hacktoberBonus, TimeService timeService) {
+        this.followersMultiplier = followersMultiplier;
+        this.hacktoberBonus = hacktoberBonus;
+        this.timeService = timeService;
+    }
 
     public int calculate(Developer dev) {
         final int followersScore = Optional.ofNullable(dev.getFollowers())
                 .map(List::size)
-                .map(cnt -> cnt * FOLLOWERS_MULTIPLIER)
+                .map(cnt -> cnt * followersMultiplier)
                 .orElse(0);
 
-        final ZonedDateTime now = ZonedDateTime.now();
-        final boolean duringHacktober = now.getMonth() == Month.OCTOBER;
+        final boolean duringHacktober = Month.OCTOBER.equals(timeService.getCurrentMonth());
 
         if (duringHacktober) {
-            return followersScore + HACKTOBER_BONUS;
-        } else {
-            return followersScore;
+            return followersScore + hacktoberBonus;
         }
+
+        return followersScore;
     }
 
 }
