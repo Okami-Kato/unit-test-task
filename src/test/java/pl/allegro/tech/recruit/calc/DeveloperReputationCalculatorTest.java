@@ -25,70 +25,57 @@ public class DeveloperReputationCalculatorTest {
     }
 
     @Test
-    public void calculate_noFollowers_notOctober() {
-        when(timeService.getCurrentMonth()).thenReturn(Month.SEPTEMBER);
-        final Developer developer = new Developer("bob", List.of());
-
-        int actual = calculator.calculate(developer);
-
-        assertEquals(0, actual);
-    }
-
-    @Test
-    public void calculate_noFollowers_inOctober() {
-        when(timeService.getCurrentMonth()).thenReturn(Month.OCTOBER);
-        final Developer developer = new Developer("bob", List.of());
-
-        int actual = calculator.calculate(developer);
-
-        assertEquals(HACKTOBER_BONUS, actual);
-    }
-
-    @Test
-    public void calculate_withFollowers_notOctober() {
-        when(timeService.getCurrentMonth()).thenReturn(Month.SEPTEMBER);
-        final List<Developer> followers = List.of(
-            new Developer("alice", List.of()),
-            new Developer("peter", List.of())
+    public void calculate_notOctober() {
+        List<Testcase> testcases = List.of(
+            new Testcase(new Developer("bob", null), 0),
+            new Testcase(new Developer("bob", List.of()), 0),
+            new Testcase(new Developer("bob", List.of(
+                new Developer("alice", List.of()),
+                new Developer("peter", List.of()))
+            ), 2 * FOLLOWERS_MULTIPLIER)
         );
-        final Developer developer = new Developer("bob", followers);
 
-        int actual = calculator.calculate(developer);
-
-        assertEquals(followers.size() * FOLLOWERS_MULTIPLIER, actual);
-    }
-
-    @Test
-    public void calculate_withFollowers_inOctober() {
-        when(timeService.getCurrentMonth()).thenReturn(Month.OCTOBER);
-        final List<Developer> followers = List.of(
-            new Developer("alice", List.of()),
-            new Developer("peter", List.of())
-        );
-        final Developer developer = new Developer("bob", followers);
-
-        int actual = calculator.calculate(developer);
-
-        assertEquals(followers.size() * FOLLOWERS_MULTIPLIER + HACKTOBER_BONUS, actual);
-    }
-
-    @Test
-    public void calculate_nullFollowers_notOctober() {
         when(timeService.getCurrentMonth()).thenReturn(Month.SEPTEMBER);
-        final Developer developer = new Developer("bob", null);
-
-        int actual = calculator.calculate(developer);
-
-        assertEquals(0, actual);
+        for (Testcase tc : testcases) {
+            int actual = calculator.calculate(tc.getInput());
+            assertEquals(tc.getWant(), actual);
+        }
     }
 
+
     @Test
-    public void calculate_nullFollowers_inOctober() {
+    public void calculate_inOctober() {
+        List<Testcase> testcases = List.of(
+            new Testcase(new Developer("bob", null), HACKTOBER_BONUS),
+            new Testcase(new Developer("bob", List.of()), HACKTOBER_BONUS),
+            new Testcase(new Developer("bob", List.of(
+                new Developer("alice", List.of()),
+                new Developer("peter", List.of()))
+            ), 2 * FOLLOWERS_MULTIPLIER + HACKTOBER_BONUS)
+        );
+
         when(timeService.getCurrentMonth()).thenReturn(Month.OCTOBER);
-        final Developer developer = new Developer("bob", null);
+        for (Testcase tc : testcases) {
+            int actual = calculator.calculate(tc.getInput());
+            assertEquals(tc.getWant(), actual);
+        }
+    }
 
-        int actual = calculator.calculate(developer);
+    private static class Testcase {
+        private final Developer input;
+        private final int want;
 
-        assertEquals(HACKTOBER_BONUS, actual);
+        public Testcase(Developer input, int want) {
+            this.input = input;
+            this.want = want;
+        }
+
+        public Developer getInput() {
+            return input;
+        }
+
+        public int getWant() {
+            return want;
+        }
     }
 }

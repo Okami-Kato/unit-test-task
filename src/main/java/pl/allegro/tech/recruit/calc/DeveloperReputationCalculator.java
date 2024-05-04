@@ -1,7 +1,6 @@
 package pl.allegro.tech.recruit.calc;
 
 import java.time.Month;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
